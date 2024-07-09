@@ -30,11 +30,21 @@ contract NFTContract is ERC721A, ERC2981, ERC721ABurnable, Ownable {
         uint96 royaltyNumerator;
     }
 
+    enum Trait {
+        None,
+        Green,
+        Blue,
+        Yellow,
+        Red,
+        Purple
+    }
+
     /**
      * Storage Variables
      */
     uint256 private immutable i_maxSupply;
-    address private immutable i_feeTokenAddress;
+    uint256 private immutable i_numTraits;
+    IERC20 private immutable i_feeToken;
 
     address private s_feeAddress;
     uint256 private s_tokenFee;
@@ -45,8 +55,8 @@ contract NFTContract is ERC721A, ERC2981, ERC721ABurnable, Ownable {
     string private s_contractURI;
     bool private s_paused;
 
-    mapping(uint256 tier => uint256) private s_limits;
-    mapping(uint256 tokenId => uint256) private s_tier;
+    mapping(Trait trait => uint256) private s_limits;
+    mapping(uint256 tokenId => Trait) private s_traits;
 
     mapping(uint256 tokenId => uint256) private s_tokenURINumber;
     uint256[] private s_ids;
@@ -73,7 +83,6 @@ contract NFTContract is ERC721A, ERC2981, ERC721ABurnable, Ownable {
     error NFTContract_ExceedsMaxPerWallet();
     error NFTContract_ExceedsBatchLimit();
     error NFTContract_FeeAddressIsZeroAddress();
-    error NFTContract_ExceedsPriceTier();
     error NFTContract_InsufficientEthFee(uint256 value, uint256 fee);
     error NFTContract_TokenTransferFailed();
     error NFTContract_EthTransferFailed();
@@ -103,16 +112,17 @@ contract NFTContract is ERC721A, ERC2981, ERC721ABurnable, Ownable {
         s_tokenFee = args.tokenFee;
         s_ethFee = args.ethFee;
         s_feeAddress = args.feeAddress;
-        i_feeTokenAddress = args.tokenAddress;
+        i_feeToken = IERC20(args.tokenAddress);
         i_maxSupply = args.maxSupply;
         s_paused = true;
 
-        // setup trait tiers
-        s_limits[0] = 10;
-        s_limits[1] = 30;
-        s_limits[2] = 110;
-        s_limits[3] = 210;
-        s_limits[3] = args.maxSupply;
+        // setup trait
+        i_numTraits = 5;
+        s_limits[Trait.Green] = 790;
+        s_limits[Trait.Blue] = 890;
+        s_limits[Trait.Yellow] = 970;
+        s_limits[Trait.Red] = 990;
+        s_limits[Trait.Purple] = args.maxSupply;
 
         // initialize randomization
         s_ids = new uint256[](args.maxSupply);
@@ -149,6 +159,15 @@ contract NFTContract is ERC721A, ERC2981, ERC721ABurnable, Ownable {
 
         _mint(msg.sender, quantity);
 
+        // pay mint fee in tokens
+        uint256 tokenFee = s_tokenFee;
+        if (tokenFee > 0) {
+            uint256 totalTokenFee = tokenFee * quantity;
+            bool success = i_feeToken.transferFrom(msg.sender, s_feeAddress, totalTokenFee);
+            if (!success) revert NFTContract_TokenTransferFailed();
+        }
+
+        // pay mint fee in ETH
         uint256 ethFee = s_ethFee;
         if (ethFee > 0) {
             uint256 totalEthFee = ethFee * quantity;
@@ -243,52 +262,57 @@ contract NFTContract is ERC721A, ERC2981, ERC721ABurnable, Ownable {
      * Getter Functions
      */
 
-    /// @notice Gets maximum supply
+    /// @notice Returns maximum supply
     function getMaxSupply() external view returns (uint256) {
         return i_maxSupply;
     }
 
-    /// @notice Gets minting fee in ETH
+    /// @notice Returns minting fee in ETH
     function getEthFee() external view returns (uint256) {
         return s_ethFee;
     }
 
-    /// @notice Gets minting fee in ERC20
+    /// @notice Returns minting fee in ERC20
     function getTokenFee() external view returns (uint256) {
         return s_tokenFee;
     }
 
-    /// @notice Gets fee token address
+    /// @notice Returns fee token address
     function getFeeToken() external view returns (address) {
-        return i_feeTokenAddress;
+        return address(i_feeToken);
     }
 
-    /// @notice Gets tier limit
-    function getTierLimit(uint256 tier) external view returns (uint256) {
-        return s_limits[tier];
+    /// @notice Returns trait limit
+    function getTraitLimit(uint256 trait) external view returns (uint256) {
+        return s_limits[Trait(trait)];
     }
 
-    /// @notice Gets address that receives minting fees
+    /// @notice Returns trait
+    function getTrait(uint256 tokenId) external view returns (Trait) {
+        return s_traits[tokenId];
+    }
+
+    /// @notice Returns address that receives minting fees
     function getFeeAddress() external view returns (address) {
         return s_feeAddress;
     }
 
-    /// @notice Gets number of nfts allowed minted at once
+    /// @notice Returns number of nfts allowed minted at once
     function getBatchLimit() external view returns (uint256) {
         return s_batchLimit;
     }
 
-    /// @notice Gets base uri
+    /// @notice Returns base uri
     function getBaseURI() external view returns (string memory) {
         return _baseURI();
     }
 
-    /// @notice Gets contract uri
+    /// @notice Returns contract uri
     function getContractURI() external view returns (string memory) {
         return s_contractURI;
     }
 
-    /// @notice Gets whether contract is paused
+    /// @notice Returns whether contract is paused
     function isPaused() external view returns (bool) {
         return s_paused;
     }
@@ -346,11 +370,16 @@ contract NFTContract is ERC721A, ERC2981, ERC721ABurnable, Ownable {
     /// @dev adapted code from openzeppelin ERC721URIStorage
     /// @param tokenId tokenId of nft
     function _setTokenURI(uint256 tokenId) private {
-        s_tokenURINumber[tokenId] = _randomTokenURI();
+        uint256 tokenUri = _randomTokenURI();
+        s_tokenURINumber[tokenId] = tokenUri;
 
-        // TODO:
-        // set trait for tokenId
-        emit MetadataUpdated(tokenId);
+        for (uint256 i = 1; i <= i_numTraits; i++) {
+            if (tokenUri <= s_limits[Trait(i)]) {
+                s_traits[tokenId] = Trait(i);
+                emit MetadataUpdated(tokenId);
+                return;
+            }
+        }
     }
 
     /// @notice Retrieves base uri

@@ -10,7 +10,7 @@ import {DeployNFTContract} from "./../../script/deployment/DeployNFTContract.s.s
 import {NFTContract} from "./../../src/NFTContract.sol";
 import {HelperConfig} from "../../script/helpers/HelperConfig.s.sol";
 
-contract NFTContractTest is Test {
+contract NFTContractDeploymentTest is Test {
     // configuration
     DeployNFTContract deployment;
     HelperConfig helperConfig;
@@ -29,7 +29,7 @@ contract NFTContractTest is Test {
     /**
      * INITIALIZATION
      */
-    function test__Initialization() public {
+    function test__unit__Initialization() public {
         assertEq(nftContract.getMaxSupply(), networkConfig.args.maxSupply);
 
         assertEq(nftContract.getFeeAddress(), networkConfig.args.feeAddress);
@@ -37,7 +37,7 @@ contract NFTContractTest is Test {
         assertEq(nftContract.contractURI(), networkConfig.args.contractURI);
 
         assertEq(nftContract.getFeeToken(), networkConfig.args.tokenAddress);
-        assertEq(nftContract.getTierLimit(0), 10);
+        assertEq(nftContract.getTraitLimit(1), 790);
         assertEq(nftContract.getBatchLimit(), 50);
         assertEq(nftContract.getEthFee(), networkConfig.args.ethFee);
         assertEq(nftContract.getTokenFee(), networkConfig.args.tokenFee);
@@ -63,7 +63,7 @@ contract NFTContractTest is Test {
     /**
      * DEPLOYMENT
      */
-    function test__RevertWhen__NoBaseURI() public {
+    function test__unit__RevertWhen__NoBaseURI() public {
         NFTContract.ConstructorArguments memory args = networkConfig.args;
 
         args.baseURI = "";
@@ -72,7 +72,7 @@ contract NFTContractTest is Test {
         new NFTContract(args);
     }
 
-    function test__RevertWhen__ZeroFeeAddress() public {
+    function test__unit__RevertWhen__ZeroFeeAddress() public {
         NFTContract.ConstructorArguments memory args = networkConfig.args;
 
         args.feeAddress = address(0);
