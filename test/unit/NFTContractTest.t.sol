@@ -1,0 +1,83 @@
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.20;
+
+import {Test, console} from "forge-std/Test.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {IERC721A} from "@erc721a/contracts/IERC721A.sol";
+import {DeployNFTContract} from "./../../script/deployment/DeployNFTContract.s.sol";
+import {NFTContract} from "./../../src/NFTContract.sol";
+import {HelperConfig} from "../../script/helpers/HelperConfig.s.sol";
+
+contract NFTContractTest is Test {
+    // configuration
+    DeployNFTContract deployment;
+    HelperConfig helperConfig;
+    HelperConfig.NetworkConfig networkConfig;
+
+    // contracts
+    NFTContract nftContract;
+
+    function setUp() external virtual {
+        deployment = new DeployNFTContract();
+        (nftContract, helperConfig) = deployment.run();
+
+        networkConfig = helperConfig.getActiveNetworkConfigStruct();
+    }
+
+    /**
+     * INITIALIZATION
+     */
+    function test__Initialization() public {
+        assertEq(nftContract.getMaxSupply(), networkConfig.args.maxSupply);
+
+        assertEq(nftContract.getFeeAddress(), networkConfig.args.feeAddress);
+        assertEq(nftContract.getBaseURI(), networkConfig.args.baseURI);
+        assertEq(nftContract.contractURI(), networkConfig.args.contractURI);
+
+        assertEq(nftContract.getFeeToken(), networkConfig.args.tokenAddress);
+        assertEq(nftContract.getTierLimit(0), 10);
+        assertEq(nftContract.getBatchLimit(), 50);
+        assertEq(nftContract.getEthFee(), networkConfig.args.ethFee);
+        assertEq(nftContract.getTokenFee(), networkConfig.args.tokenFee);
+        assertEq(nftContract.isPaused(), true);
+
+        assertEq(nftContract.supportsInterface(0x80ac58cd), true); // ERC721
+        assertEq(nftContract.supportsInterface(0x2a55205a), true); // ERC2981
+
+        vm.expectRevert(IERC721A.OwnerQueryForNonexistentToken.selector);
+        nftContract.tokenURI(1);
+    }
+
+    /**
+     * ROYALTIES
+     */
+    function test__unit__InitialRoyalties() public view {
+        uint256 salePrice = 100;
+        (address feeAddress, uint256 royaltyAmount) = nftContract.royaltyInfo(1, salePrice);
+        assertEq(feeAddress, networkConfig.args.feeAddress);
+        assertEq(royaltyAmount, (networkConfig.args.royaltyNumerator * 100) / 10000);
+    }
+
+    /**
+     * DEPLOYMENT
+     */
+    function test__RevertWhen__NoBaseURI() public {
+        NFTContract.ConstructorArguments memory args = networkConfig.args;
+
+        args.baseURI = "";
+
+        vm.expectRevert(NFTContract.NFTContract_NoBaseURI.selector);
+        new NFTContract(args);
+    }
+
+    function test__RevertWhen__ZeroFeeAddress() public {
+        NFTContract.ConstructorArguments memory args = networkConfig.args;
+
+        args.feeAddress = address(0);
+
+        vm.expectRevert(NFTContract.NFTContract_FeeAddressIsZeroAddress.selector);
+        new NFTContract(args);
+    }
+}
