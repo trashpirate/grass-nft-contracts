@@ -38,25 +38,28 @@ format :; forge fmt
 anvil :; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 1
 
 # spin up fork
-fork :; @anvil --fork-url ${RPC_BASE_MAIN} --fork-block-number 38759370 --fork-chain-id 56 --chain-id 123
+fork :; @anvil --fork-url ${RPC_BASE_MAIN} --fork-block-number 16895866 --fork-chain-id 8453 --chain-id 123
 
 # deployment
 deploy-local: 
-	@forge script script/deployment/DeployNFTContract.s.sol:DeployNFTContract --rpc-url localhost --private-key ${DEFAULT_ANVIL_KEY} --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --broadcast 
+	@forge script script/deployment/DeployNFTContract.s.sol:DeployNFTContract --rpc-url ${RPC_LOCALHOST} --private-key ${DEFAULT_ANVIL_KEY} --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --broadcast 
+
+deploy-token-testnet: 
+	@forge script script/deployment/DeployERC20Token.s.sol:DeployERC20Token --rpc-url $(RPC_BASE_SEPOLIA) --account Grassy-Deployer --sender 0xa25c35fb88b40A8fFA1DeD934d494fc79339Cb1f --broadcast --verify --etherscan-api-key $(BASESCAN_KEY) -vvvv
 
 deploy-testnet: 
-	@forge script script/deployment/DeployNFTContract.s.sol:DeployNFTContract --rpc-url $(RPC_BASE_TEST) --account Battlepillar-Deployer --sender 0xA94D468Af30923169e8A146472C03f223dBeB8B0 --broadcast --verify --etherscan-api-key $(BASESCAN_KEY) -vvvv
+	@forge script script/deployment/DeployNFTContract.s.sol:DeployNFTContract --rpc-url $(RPC_BASE_SEPOLIA) --account Grassy-Deployer --sender 0xa25c35fb88b40A8fFA1DeD934d494fc79339Cb1f --broadcast --verify --etherscan-api-key $(BASESCAN_KEY) -vvvv
 
 deploy-mainnet: 
-	@forge script script/deployment/DeployNFTContract.s.sol:DeployNFTContract --rpc-url $(RPC_BASE_MAIN) --account Battlepillar-Deployer --sender 0xA94D468Af30923169e8A146472C03f223dBeB8B0 --broadcast --verify --etherscan-api-key $(BASESCAN_KEY) -vvvv
+	@forge script script/deployment/DeployNFTContract.s.sol:DeployNFTContract --rpc-url $(RPC_BASE_MAIN) --account Grassy-Deployer --sender 0xa25c35fb88b40A8fFA1DeD934d494fc79339Cb1f --broadcast --verify --etherscan-api-key $(BASESCAN_KEY) -vvvv
 
 
 # interaction
 mint-testnet:
-	@forge script script/interactions/Interactions.s.sol:MintNft --rpc-url $(RPC_BASE_TEST) --account Battlepillar-Deployer --sender 0xA94D468Af30923169e8A146472C03f223dBeB8B0 --broadcast
+	@forge script script/interactions/Interactions.s.sol:MintNft --rpc-url $(RPC_BASE_SEPOLIA) --account Grassy-Deployer --sender 0xa25c35fb88b40A8fFA1DeD934d494fc79339Cb1f --broadcast
 
 mint-batch-testnet:
-	@forge script script/interactions/Interactions.s.sol:BatchMint --rpc-url $(RPC_BASE_TEST) --account Battlepillar-Deployer --sender 0xA94D468Af30923169e8A146472C03f223dBeB8B0 --broadcast
+	@forge script script/interactions/Interactions.s.sol:BatchMint --rpc-url $(RPC_BASE_SEPOLIA) --account Grassy-Deployer --sender 0xa25c35fb88b40A8fFA1DeD934d494fc79339Cb1f --broadcast
 
 
 # security

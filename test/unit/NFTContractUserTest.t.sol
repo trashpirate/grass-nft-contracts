@@ -112,6 +112,7 @@ contract TestUserFunctions is Test {
     function test__unit__Mint(uint256 quantity, address account) public unpaused skipFork {
         quantity = bound(quantity, 1, nftContract.getBatchLimit());
         vm.assume(account != address(0));
+        vm.assume(account != nftContract.getFeeAddress());
 
         fund(account);
 
@@ -415,13 +416,13 @@ contract TestUserFunctions is Test {
             }
         }
 
-        if (tokenUriNumber <= 790) {
+        if (tokenUriNumber < 790) {
             assertEq(uint256(nftContract.getTrait(1)), uint256(Trait.Green));
-        } else if (tokenUriNumber <= 890) {
+        } else if (tokenUriNumber < 890) {
             assertEq(uint256(nftContract.getTrait(1)), uint256(Trait.Blue));
-        } else if (tokenUriNumber <= 970) {
+        } else if (tokenUriNumber < 970) {
             assertEq(uint256(nftContract.getTrait(1)), uint256(Trait.Yellow));
-        } else if (tokenUriNumber <= 990) {
+        } else if (tokenUriNumber < 990) {
             assertEq(uint256(nftContract.getTrait(1)), uint256(Trait.Red));
         } else {
             assertEq(uint256(nftContract.getTrait(1)), uint256(Trait.Purple));

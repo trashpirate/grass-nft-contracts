@@ -98,6 +98,8 @@ contract NFTContract is ERC721A, ERC2981, ERC721ABurnable, Ownable {
     ///                     symbol: nft symbol
     ///                     owner: contract owner
     ///                     ethFee: minting fee in native coin
+    ///                     token: minting fee in erc20
+    ///                     tokenAddress: erc20 token address used for fees
     ///                     feeAddress: address for fees
     ///                     baseURI: base uri
     ///                     contractURI: contract uri
@@ -131,7 +133,9 @@ contract NFTContract is ERC721A, ERC2981, ERC721ABurnable, Ownable {
         _setBaseURI(args.baseURI);
         _setContractURI(args.contractURI);
         _setDefaultRoyalty(args.feeAddress, args.royaltyNumerator);
-        _transferOwnership(args.owner);
+
+        // set ownership
+        if (args.owner != msg.sender) _transferOwnership(args.owner);
     }
 
     receive() external payable {}
@@ -186,8 +190,8 @@ contract NFTContract is ERC721A, ERC2981, ERC721ABurnable, Ownable {
         emit EthFeeSet(msg.sender, fee);
     }
 
-    /// @notice Sets minting fee in ETH (only owner)
-    /// @param fee New fee in ETH
+    /// @notice Sets minting fee in ERC20 (only owner)
+    /// @param fee New fee in ERC20
     function setTokenFee(uint256 fee) external onlyOwner {
         s_tokenFee = fee;
         emit TokenFeeSet(msg.sender, fee);
@@ -374,7 +378,7 @@ contract NFTContract is ERC721A, ERC2981, ERC721ABurnable, Ownable {
         s_tokenURINumber[tokenId] = tokenUri;
 
         for (uint256 i = 1; i <= i_numTraits; i++) {
-            if (tokenUri <= s_limits[Trait(i)]) {
+            if (tokenUri < s_limits[Trait(i)]) {
                 s_traits[tokenId] = Trait(i);
                 emit MetadataUpdated(tokenId);
                 return;

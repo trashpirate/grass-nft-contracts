@@ -8,11 +8,10 @@ import {NFTContract} from "./../../src/NFTContract.sol";
 contract HelperConfig is Script {
     // deployment arguments
 
-    string public constant NAME = "Battlepillars";
-    string public constant SYMBOL = "BATTLEPILLAR";
-    string public constant BASE_URI = "ipfs://bafybeihvxdrut363rlk65caliu6utzyqo45cm6p5nelbl44hiclo4hhn2i/";
-    string public constant CONTRACT_URI =
-        "ipfs://bafybeieomuw57yvoi44xkg6zyfzohaxiblr4wv4iafhwnfgprzzc4ot5xa/contractMetadata";
+    string public constant NAME = "Touch Grassy";
+    string public constant SYMBOL = "GRASSY";
+    string public constant BASE_URI = "ipfs://bafybeidunoa4h3e5kvddib6gi53nhmbm32lzvcaxqccdforsiih2mwubky/";
+    string public constant CONTRACT_URI = "ipfs://bafkreiez4tklbxcv5e45s5zed5l2x2atmf7d26lfuo42xbbddnlppnzngm";
     uint256 public constant MAX_SUPPLY = 1000;
     uint96 public constant ROYALTY = 500;
 
@@ -45,8 +44,8 @@ contract HelperConfig is Script {
             args: NFTContract.ConstructorArguments({
                 name: NAME,
                 symbol: SYMBOL,
-                owner: 0x0d8470Ce3F816f29AA5C0250b64BfB6421332829,
-                feeAddress: 0x0d8470Ce3F816f29AA5C0250b64BfB6421332829,
+                owner: 0xa25c35fb88b40A8fFA1DeD934d494fc79339Cb1f,
+                feeAddress: 0xa839967C96197521C19b6926aeB731A59CaE6E2B,
                 tokenAddress: 0xBb4f69A0FCa3f63477B6B3b2A3E8491E5425A356,
                 ethFee: ETH_FEE,
                 tokenFee: TOKEN_FEE,
@@ -63,9 +62,9 @@ contract HelperConfig is Script {
             args: NFTContract.ConstructorArguments({
                 name: NAME,
                 symbol: SYMBOL,
-                owner: 0xA94D468Af30923169e8A146472C03f223dBeB8B0,
-                feeAddress: 0x7Bb8be3D9015682d7AC0Ea377dC0c92B0ba152eF,
-                tokenAddress: 0xBb4f69A0FCa3f63477B6B3b2A3E8491E5425A356,
+                owner: 0xa25c35fb88b40A8fFA1DeD934d494fc79339Cb1f,
+                feeAddress: 0xa839967C96197521C19b6926aeB731A59CaE6E2B,
+                tokenAddress: 0xE9e5d3F02E91B8d3bc74Cf7cc27d6F13bdfc0BB6,
                 ethFee: ETH_FEE,
                 tokenFee: TOKEN_FEE,
                 baseURI: BASE_URI,
