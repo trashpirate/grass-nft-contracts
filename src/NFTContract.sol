@@ -10,7 +10,7 @@ import {ERC721ABurnable} from "@erc721a/contracts/extensions/ERC721ABurnable.sol
 
 /// @title NFTContract NFTs
 /// @author Nadina Oates
-/// @notice Contract implementing ERC721A standard using the ERC20 token and ETH for minting
+/// @notice Contract implementing ERC721A standard using ERC20 token and ETH for minting
 /// @dev Inherits from ERC721A and ERC721ABurnable and openzeppelin Ownable
 contract NFTContract is ERC721A, ERC2981, ERC721ABurnable, Ownable {
     /**

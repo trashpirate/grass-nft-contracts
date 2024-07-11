@@ -1,4 +1,4 @@
-# NFT-CONTRACT 🔥
+# GRASS NFT CONTRACT 🌿
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?style=for-the-badge)
 ![Forge](https://img.shields.io/badge/Forge-v0.2.0-blue?style=for-the-badge)
@@ -29,7 +29,7 @@
   </ol>
 </details>
 
-
+![TouchGrassy](https://app.touchbasedgrass.com/title.png?raw=true)
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -42,8 +42,11 @@ https://sepolia.basescan.org/address/0xe9e5d3f02e91b8d3bc74cf7cc27d6f13bdfc0bb6
 ### NFT Contract Testnet
 https://sepolia.basescan.org/address/0x77b6d8decfc2dfedb53be9fa527d7939af0e592c
 
-### NFT Contract Mainnet
+### TOKEN Contract Mainnet  
+https://basescan.org/address/0xBb4f69A0FCa3f63477B6B3b2A3E8491E5425A356
 
+### NFT Contract Mainnet
+https://basescan.org/address/0xe9e5d3f02e91b8d3bc74cf7cc27d6f13bdfc0bb6
 
 <!-- GETTING STARTED -->
 ## Getting Started
